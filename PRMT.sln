@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24 d17.14
+VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Domain", "PRM.Domain\PRM.Domain.csproj", "{E659BEF1-A5C2-4B43-9DD9-3B422DEFCA3D}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Infrastructure", "PRM.Infrastructure\PRM.Infrastructure.csproj", "{B5F2424B-CF6C-4537-9909-635CB7324804}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.API", "PRM.API\PRM.API.csproj", "{B2457D37-6A8E-4589-A38C-657F66FC3863}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PRM.Client", "PRM.Client\PRM.Client.csproj", "{66774232-5DB9-476E-9929-DF4BD31D5962}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{B2457D37-6A8E-4589-A38C-657F66FC3863}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2457D37-6A8E-4589-A38C-657F66FC3863}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2457D37-6A8E-4589-A38C-657F66FC3863}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66774232-5DB9-476E-9929-DF4BD31D5962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66774232-5DB9-476E-9929-DF4BD31D5962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66774232-5DB9-476E-9929-DF4BD31D5962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66774232-5DB9-476E-9929-DF4BD31D5962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

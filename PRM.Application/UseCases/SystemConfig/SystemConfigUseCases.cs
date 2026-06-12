@@ -28,7 +28,7 @@ namespace PRM.Application.UseCases.SystemConfig
 
     public class UpdateSystemConfigUseCase(IUnitOfWork unitOfWork)
     {
-        private static readonly string[] AllowedProviders = ["Gemini", "Groq"];
+        private static readonly string[] AllowedProviders = ["Gemini", "Groq", "InHouse"];
 
         public async Task<Result<SystemConfigResponse>> ExecuteAsync(UpdateSystemConfigRequest request, CancellationToken ct = default)
         {

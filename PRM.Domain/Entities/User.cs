@@ -9,13 +9,16 @@ namespace PRM.Domain.Entities
 {
     public class User: BaseEntity
     {
+        public string FullName { get; set; } = string.Empty;
         public string Username { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
-        public string FullName { get; set; } = string.Empty;
         public UserRole Role { get; set; }
+        public string Department { get; set; } = string.Empty;
+        public string Designation { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
         public bool ForcePasswordChange { get; set; } = true;
         public Employee? Employee { get; set; }
+        public ICollection<Employee> ManagedEmployees { get; set; } = [];
     }
 }

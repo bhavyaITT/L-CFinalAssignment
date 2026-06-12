@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PRM.Application.DTOs.Users;
 using PRM.Application.UseCases.Users;
@@ -32,7 +29,10 @@ namespace PRM.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateUserRequest request, CancellationToken ct)
         {
-            var result = await createUser.ExecuteAsync(request, ct);
+            var userId = User.GetUserId();
+            if (userId is null) return Unauthorized();
+
+            var result = await createUser.ExecuteAsync(userId.Value,request, ct);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.Error });
@@ -41,7 +41,7 @@ namespace PRM.API.Controllers
         }
 
         /// <summary>PUT /api/users/{id}/reset-password — Reset a user's password</summary>
-        [HttpPut("{username:string}/reset-password")]
+        [HttpPut("{username}/reset-password")]
         public async Task<IActionResult> ResetPassword(string username, [FromBody] ResetPasswordRequest request, CancellationToken ct)
         {
             var result = await resetPassword.ExecuteAsync(username, request, ct);
@@ -53,7 +53,7 @@ namespace PRM.API.Controllers
         }
 
         /// <summary>PUT /api/users/{id}/deactivate — Block a user's login</summary>
-        [HttpPut("{username: string}/deactivate")]
+        [HttpPut("{username}/deactivate")]
         public async Task<IActionResult> Deactivate(string username, CancellationToken ct)
         {
             var result = await deactivateUser.ExecuteAsync(username, ct);
@@ -65,7 +65,7 @@ namespace PRM.API.Controllers
         }
 
         /// <summary>PUT /api/users/{id}/reactivate — Re-enable a user's login</summary>
-        [HttpPut("{username: string}/reactivate")]
+        [HttpPut("{username}/reactivate")]
         public async Task<IActionResult> Reactivate(string username, CancellationToken ct)
         {
             var result = await reactivateUser.ExecuteAsync(username, ct);

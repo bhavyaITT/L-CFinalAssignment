@@ -41,7 +41,7 @@ namespace PRM.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.Error });
 
-            return Ok(new { message = "Password changed successfully." });
+            return Ok();
         }
     }
 }

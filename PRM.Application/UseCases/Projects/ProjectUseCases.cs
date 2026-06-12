@@ -21,13 +21,15 @@ namespace PRM.Application.UseCases.Projects
             if (request.EndDate <= request.StartDate)
                 return Result<ProjectSummaryResponse>.Failure("End date must be after start date.");
 
-            var manager = await unitOfWork.Employees.GetByIdAsync(request.ManagerId, ct);
-            if (manager is null || !manager.IsActive)
-                return Result<ProjectSummaryResponse>.Failure($"Active employee with ID {request.ManagerId} not found.");
+            var managerUser = await unitOfWork.Users.GetByIdAsync(request.ManagerId, ct);
+            if (managerUser is null || !managerUser.IsActive)
+                return Result<ProjectSummaryResponse>.Failure($"Active manager with ID {request.ManagerId} not found.");
 
-            var managerUser = await unitOfWork.Users.GetByIdAsync(manager.UserId, ct);
-            if (managerUser is null || managerUser.Role != UserRole.Manager)
+            if (managerUser.Role != UserRole.Manager)
                 return Result<ProjectSummaryResponse>.Failure("The assigned manager must have the Manager role.");
+
+            if (!await unitOfWork.Employees.AnyAsync(e => e.Id == request.ManagerId, ct))
+                return Result<ProjectSummaryResponse>.Failure($"Employee profile for manager ID {request.ManagerId} not found.");
 
             var project = new Project
             {
@@ -45,7 +47,7 @@ namespace PRM.Application.UseCases.Projects
 
             return Result<ProjectSummaryResponse>.Success(new ProjectSummaryResponse(
                 project.Id, project.Name, project.Description, project.StartDate, project.EndDate,
-                project.Status.ToString(), project.Health.ToString(), project.ManagerId, manager.FullName
+                project.Status.ToString(), project.Health.ToString(), project.ManagerId, managerUser.FullName
             ));
         }
     }
@@ -86,7 +88,7 @@ namespace PRM.Application.UseCases.Projects
             if (project is null)
                 return Result<ProjectSummaryResponse>.Failure($"Project with ID {projectId} not found.");
 
-            var manager = await unitOfWork.Employees.GetByIdAsync(request.ManagerId, ct);
+            var manager = await unitOfWork.Users.GetByIdAsync(request.ManagerId, ct);
             if (manager is null || !manager.IsActive)
                 return Result<ProjectSummaryResponse>.Failure($"Active employee with ID {request.ManagerId} not found.");
 

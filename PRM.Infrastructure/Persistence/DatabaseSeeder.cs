@@ -52,7 +52,7 @@ namespace PRM.Infrastructure.Persistence
             context.SystemConfigurations.Add(new SystemConfiguration
             {
                 LlmProvider = "Gemini",
-                LlmApiKey = string.Empty,
+                LlmApiKey = "",
                 SchedulerIntervalHours = 4,
                 MaxWeeklyHours = 40,
                 CreatedAt = DateTime.UtcNow

@@ -1,10 +1,5 @@
 ﻿using PRM.Application.DTOs.Employee;
 using PRM.Application.Interfaces.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PRM.Application.UseCases.Employees
 {
@@ -16,23 +11,26 @@ namespace PRM.Application.UseCases.Employees
             if (employee is null)
                 return Result<EmployeeSummaryResponse>.Failure($"Employee with ID {employeeId} not found.");
 
-            if (!employee.IsActive)
+            var user = await unitOfWork.Users.GetByIdAsync(employeeId, ct);
+            if (user is null)
+                return Result<EmployeeSummaryResponse>.Failure($"User account for employee ID {employeeId} not found.");
+
+            if (!user.IsActive)
                 return Result<EmployeeSummaryResponse>.Failure("Cannot update a deactivated employee.");
 
-            employee.FullName = request.FullName;
-            employee.Email = request.Email;
-            employee.Department = request.Department;
-            employee.Designation = request.Designation;
+            user.FullName = request.FullName;
+            user.Email = request.Email;
+            user.Department = request.Department;
+            user.Designation = request.Designation;
 
-            unitOfWork.Employees.Update(employee);
+            unitOfWork.Users.Update(user);
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result<EmployeeSummaryResponse>.Success(new EmployeeSummaryResponse(
-                employee.Id, employee.FullName, employee.Email,
-                employee.Department, employee.Designation,
-                employee.Status.ToString(), employee.IsActive
+                employee.Id, user.FullName, user.Email,
+                user.Department, user.Designation,
+                employee.Status.ToString(), user.IsActive
             ));
         }
     }
-
 }

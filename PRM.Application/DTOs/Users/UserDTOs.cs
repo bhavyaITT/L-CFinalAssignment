@@ -11,7 +11,9 @@ namespace PRM.Application.DTOs.Users
      string Email,
      string Username,
      string TemporaryPassword,
-     string Role          // "Admin" | "Manager" | "Employee"
+     string Role,         // "Admin" | "Manager" | "Employee"
+     string Department,       // Required for Manager and Employee
+     string Designation       // Required for Manager and Employee
  );
 
     public record ResetPasswordRequest(

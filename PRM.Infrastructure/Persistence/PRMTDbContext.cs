@@ -21,6 +21,8 @@ namespace PRM.Infrastructure.Persistence
         public DbSet<Timesheet> Timesheets => Set<Timesheet>();
         public DbSet<TimesheetEntry> TimesheetEntries => Set<TimesheetEntry>();
         public DbSet<SystemConfiguration> SystemConfigurations => Set<SystemConfiguration>();
+        //public DbSet<Role> Roles => Set<Role>();
+        //public DbSet<UserRoleMapping> UserRoleMappings => Set<UserRoleMapping>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

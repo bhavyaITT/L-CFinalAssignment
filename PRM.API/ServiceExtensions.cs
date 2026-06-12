@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,11 +7,16 @@ using PRM.API.Controllers;
 using PRM.Application.Interfaces.Repository;
 using PRM.Application.Interfaces.Service;
 using PRM.Application.UseCases;
+using PRM.Application.UseCases.AI;
 using PRM.Application.UseCases.Auth;
 using PRM.Application.UseCases.Employees;
+using PRM.Application.UseCases.Manager;
 using PRM.Application.UseCases.Projects;
 using PRM.Application.UseCases.SystemConfig;
 using PRM.Application.UseCases.Users;
+using PRM.Infrastructure.AI;
+using PRM.Infrastructure.AI.Prompts;
+using PRM.Infrastructure.BackgroundJobs;
 using PRM.Infrastructure.ExternalService;
 using PRM.Infrastructure.Persistence;
 using PRM.Infrastructure.Repositories;
@@ -58,6 +64,7 @@ namespace PRM.API
             services.AddScoped<ReactivateUserUseCase>();
 
             // ── Employees ─────────────────────────────────────────
+            services.AddScoped<AssignManagerUseCase>();
             services.AddScoped<CreateEmployeeUseCase>();
             services.AddScoped<GetAllEmployeesUseCase>();
             services.AddScoped<GetEmployeeDetailUseCase>();
@@ -65,6 +72,7 @@ namespace PRM.API
             services.AddScoped<DeactivateEmployeeUseCase>();
 
             // ── Skills ────────────────────────────────────────────
+            services.AddScoped<GetSkillUseCase>();
             services.AddScoped<AddSkillUseCase>();
             services.AddScoped<UpdateSkillProficiencyUseCase>();
             services.AddScoped<RemoveSkillUseCase>();
@@ -87,23 +95,35 @@ namespace PRM.API
             services.AddScoped<UpdateSystemConfigUseCase>();
 
             //// ── Manager Module (Phase 3) ──────────────────────────
-            //services.AddScoped<ResolveEmployeeIdUseCase>();
-            //services.AddScoped<GetResourceDashboardUseCase>();
-            //services.AddScoped<GetEmployeeDrillInUseCase>();
-            //services.AddScoped<ValidateAllocationUseCase>();
-            //services.AddScoped<CreateAllocationUseCase>();
-            //services.AddScoped<EndAllocationUseCase>();
-            //services.AddScoped<GetActiveAllocationsOnProjectUseCase>();
-            //services.AddScoped<GetMyProjectsUseCase>();
-            //services.AddScoped<GetMyProjectDetailUseCase>();
-            //services.AddScoped<GetTeamTimesheetsUseCase>();
+            services.AddScoped<ResolveEmployeeIdUseCase>();
+            services.AddScoped<GetResourceDashboardUseCase>();
+            services.AddScoped<GetEmployeeDrillInUseCase>();
+            services.AddScoped<ValidateAllocationUseCase>();
+            services.AddScoped<CreateAllocationUseCase>();
+            services.AddScoped<EndAllocationUseCase>();
+            services.AddScoped<GetActiveAllocationsOnProjectUseCase>();
+            services.AddScoped<GetMyProjectsUseCase>();
+            services.AddScoped<GetMyProjectDetailUseCase>();
+            services.AddScoped<GetTeamTimesheetsUseCase>();
 
             //// ── Employee Module (Phase 4) ──────────────────────────
-            //services.AddScoped<GetActiveAllocationsForWeekUseCase>();
-            //services.AddScoped<SubmitTimesheetUseCase>();
-            //services.AddScoped<GetMyTimesheetsUseCase>();
-            //services.AddScoped<GetMyAllocationsUseCase>();
-            //services.AddScoped<CheckMissedTimesheetUseCase>();
+            services.AddScoped<GetActiveAllocationsForWeekUseCase>();
+            services.AddScoped<SubmitTimesheetUseCase>();
+            services.AddScoped<GetMyTimesheetsUseCase>();
+            services.AddScoped<GetMyAllocationsUseCase>();
+            services.AddScoped<CheckMissedTimesheetUseCase>();
+
+            // ── AI (Phase 5) ───────────────────────────────────────
+            services.AddScoped<ILlmClientFactory, LlmClientFactory>();
+            services.AddScoped<SkillMatchUseCase>();
+            services.AddScoped<TeamSkillMatchUseCase>();
+            services.AddScoped<RiskSummaryUseCase>();
+
+            // ── Background Jobs (Phase 5) ──────────────────────────
+            services.AddScoped<UtilisationRecomputeJob>();
+            services.AddScoped<ProjectHealthFlaggingJob>();
+            services.AddScoped<MissedTimesheetDetectionJob>();
+            services.AddScoped<ISchedulerService, HangfireSchedulerService>();
 
             return services;
         }
@@ -133,6 +153,22 @@ namespace PRM.API
                 });
 
             services.AddAuthorization();
+            return services;
+        }
+
+        public static IServiceCollection AddHangfireServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddHangfireServer(options =>
+            {
+                options.WorkerCount = 2;
+            });
+
             return services;
         }
     }

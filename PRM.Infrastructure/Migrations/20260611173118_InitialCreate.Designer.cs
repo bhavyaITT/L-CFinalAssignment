@@ -12,8 +12,8 @@ using PRM.Infrastructure.Persistence;
 namespace PRM.Infrastructure.Migrations
 {
     [DbContext(typeof(PRMTDbContext))]
-    [Migration("20260609064048_ChangedUpdatedAt")]
-    partial class ChangedUpdatedAt
+    [Migration("20260611173118_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,36 +66,13 @@ namespace PRM.Infrastructure.Migrations
             modelBuilder.Entity("PRM.Domain.Entities.Employee", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Designation")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                    b.Property<int>("ManagerId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -105,13 +82,9 @@ namespace PRM.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("ManagerId");
 
                     b.ToTable("Employees", (string)null);
                 });
@@ -361,6 +334,16 @@ namespace PRM.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Designation")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -428,9 +411,17 @@ namespace PRM.Infrastructure.Migrations
                 {
                     b.HasOne("PRM.Domain.Entities.User", "User")
                         .WithOne("Employee")
-                        .HasForeignKey("PRM.Domain.Entities.Employee", "UserId")
+                        .HasForeignKey("PRM.Domain.Entities.Employee", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PRM.Domain.Entities.User", "Manager")
+                        .WithMany("ManagedEmployees")
+                        .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Manager");
 
                     b.Navigation("User");
                 });
@@ -522,6 +513,8 @@ namespace PRM.Infrastructure.Migrations
             modelBuilder.Entity("PRM.Domain.Entities.User", b =>
                 {
                     b.Navigation("Employee");
+
+                    b.Navigation("ManagedEmployees");
                 });
 #pragma warning restore 612, 618
         }

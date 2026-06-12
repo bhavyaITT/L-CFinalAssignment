@@ -41,14 +41,14 @@ namespace PRM.Application.UseCases.Users
 
             user.IsActive = true;
 
-            int employeeId = (await unitOfWork.Employees.FirstOrDefaultAsync(e => e.UserId == user.Id, ct))?.Id ?? 0;
-            var employee = await unitOfWork.Employees.GetByIdAsync(employeeId, ct);
-            if (employee is null)
-                return Result.Failure("Linked employee profile not found.");
-            employee.IsActive = true;
+            //int employeeId = (await unitOfWork.Employees.FirstOrDefaultAsync(e => e.UserId == user.Id, ct))?.Id ?? 0;
+            //var employee = await unitOfWork.Employees.GetByIdAsync(employeeId, ct);
+            //if (employee is null)
+            //    return Result.Failure("Linked employee profile not found.");
+            //employee.IsActive = true;
 
             unitOfWork.Users.Update(user);
-            unitOfWork.Employees.Update(employee);
+            //unitOfWork.Employees.Update(employee);
             await unitOfWork.SaveChangesAsync(ct);
 
             return Result.Success();

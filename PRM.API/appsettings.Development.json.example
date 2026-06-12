@@ -1,0 +1,7 @@
+{
+  "LlmSettings": {
+    "InHouse": {
+      "ApiKey": "YOUR_IN_HOUSE_LLM_KEY_HERE"
+    }
+  }
+}

@@ -16,18 +16,27 @@ namespace PRM.API.Controllers
     GetEmployeeDetailUseCase getEmployeeDetail,
     UpdateEmployeeUseCase updateEmployee,
     DeactivateEmployeeUseCase deactivateEmployee,
+    GetSkillUseCase getSkill,
     AddSkillUseCase addSkill,
     UpdateSkillProficiencyUseCase updateSkillProficiency,
-    RemoveSkillUseCase removeSkill) : ControllerBase
+    RemoveSkillUseCase removeSkill,
+    AssignManagerUseCase assignManager) : ControllerBase
     {
-        /// <summary>GET /api/employees?status=Bench&department=Backend</summary>
+        ///// <summary>GET /api/employees?status=Bench&department=Backend</summary>
+        //[HttpGet]
+        //public async Task<IActionResult> GetAll(
+        //    [FromQuery] string? status,
+        //    [FromQuery] string? department,
+        //    CancellationToken ct)
+        //{
+        //    var result = await getAllEmployees.ExecuteAsync(status, department, ct);
+        //    return Ok(result.Data);
+        //}
+
         [HttpGet]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] string? status,
-            [FromQuery] string? department,
-            CancellationToken ct)
+        public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            var result = await getAllEmployees.ExecuteAsync(status, department, ct);
+            var result = await getAllEmployees.ExecuteAsync(ct);
             return Ok(result.Data);
         }
 
@@ -44,16 +53,16 @@ namespace PRM.API.Controllers
         }
 
         /// <summary>POST /api/employees</summary>
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateEmployeeRequest request, CancellationToken ct)
-        {
-            var result = await createEmployee.ExecuteAsync(request, ct);
+        //[HttpPost]
+        //public async Task<IActionResult> Create([FromBody] CreateEmployeeRequest request, CancellationToken ct)
+        //{
+        //    var result = await createEmployee.ExecuteAsync(request, ct);
 
-            if (!result.IsSuccess)
-                return BadRequest(new { message = result.Error });
+        //    if (!result.IsSuccess)
+        //        return BadRequest(new { message = result.Error });
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result.Data);
-        }
+        //    return CreatedAtAction(nameof(GetById), new { id = result.Data!.Id }, result.Data);
+        //}
 
         /// <summary>PUT /api/employees/{id}</summary>
         [HttpPut("{id:int}")]
@@ -82,14 +91,14 @@ namespace PRM.API.Controllers
         // ── Skills ────────────────────────────────────────────────────────────────
 
         [HttpGet("{employeeId:int}/skills")]
-        public async Task<IActionResult> GetSkill(int employeeId, [FromBody] AddSkillRequest request, CancellationToken ct)
+        public async Task<IActionResult> GetSkill(int employeeId, CancellationToken ct)
         {
-            var result = await addSkill.ExecuteAsync(employeeId, request, ct);
+            var result = await getSkill.ExecuteAsync(employeeId, ct);
 
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.Error });
 
-            return CreatedAtAction(nameof(GetById), new { employeeId }, result.Data);
+            return Ok(result.Data);
         }
 
         /// <summary>POST /api/employees/{id}/skills</summary>
@@ -101,7 +110,7 @@ namespace PRM.API.Controllers
             if (!result.IsSuccess)
                 return BadRequest(new { message = result.Error });
 
-            return CreatedAtAction(nameof(GetById), new { id }, result.Data);
+            return Ok(result.Data);
         }
 
         /// <summary>PUT /api/employees/skills/{skillId}</summary>
@@ -127,5 +136,18 @@ namespace PRM.API.Controllers
 
             return Ok(new { message = "Skill removed." });
         }
+
+        /// <summary>PUT /api/employees/{id}/manager</summary>
+        [HttpPut("{id:int}/manager/{managerId:int}")]
+        public async Task<IActionResult> AssignManager(int id, int managerId,  CancellationToken ct)
+        {
+            var result = await assignManager.ExecuteAsync(id, managerId, ct);
+
+            if (!result.IsSuccess)
+                return BadRequest(new { message = result.Error });
+
+            return Ok(new { message = "Manager assigned successfully." });
+        }
+
     }
 }

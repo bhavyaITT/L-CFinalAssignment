@@ -31,6 +31,9 @@ namespace PRM.Infrastructure.Persistence.Configurations
                 .HasConversion<string>()  // Store as "Admin", "Manager", "Employee" — readable in DB
                 .HasMaxLength(50);
 
+            builder.Property(e => e.Department).IsRequired().HasMaxLength(100);
+            builder.Property(e => e.Designation).IsRequired().HasMaxLength(100);
+
             // Unique indexes — server enforces these, not just application code
             builder.HasIndex(u => u.Username).IsUnique();
             builder.HasIndex(u => u.Email).IsUnique();

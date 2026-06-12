@@ -17,8 +17,13 @@ namespace PRM.Application.UseCases.Users
                 return Result.Failure("Temporary password must be 8+ characters with at least one uppercase letter and one number.");
 
             var user = await unitOfWork.Users.FirstOrDefaultAsync(u => u.Username == username, ct);
+
+
             if (user is null)
                 return Result.Failure("User not found.");
+
+            if(user.Role == Domain.Enums.UserRole.Admin)
+                return Result.Failure("Cannot reset password for Admin accounts.");
 
             user.PasswordHash = passwordHasher.Hash(request.NewTemporaryPassword);
             user.ForcePasswordChange = true;  // Forces change on next login
